@@ -1,0 +1,27 @@
+# GitHub OAuth Configuration
+# Create a GitHub OAuth App at: https://github.com/settings/developers
+# For local development:
+#   - Homepage URL: http://localhost:8792
+#   - Callback URL: http://localhost:8792/callback
+GITHUB_CLIENT_ID=your_github_client_id_here
+GITHUB_CLIENT_SECRET=your_github_client_secret_here
+
+# Cookie Encryption Key (generate with: openssl rand -hex 32)
+COOKIE_ENCRYPTION_KEY=your_64_character_hex_encryption_key_here
+
+# PostgreSQL Database Connection
+# Replace with your actual database connection string
+# Formats:
+#   Local: postgresql://user:pass@localhost:5432/dbname
+#   Supabase: postgresql://postgres:password@db.project.supabase.co:5432/postgres
+#   Cloud: postgresql://user:pass@host:5432/database
+DATABASE_URL=postgresql://your_user:your_password@your_host:5432/your_database
+
+# Optional: Sentry Error Monitoring
+# 1. Create account at https://sentry.io
+# 2. Create new project, select "Cloudflare Workers" platform
+# 3. Copy your DSN from project settings
+SENTRY_DSN=https://your-sentry-dsn@sentry.io/project-id
+
+# Development Environment
+NODE_ENV=development
