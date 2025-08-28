@@ -5,7 +5,13 @@
 **🔐 Authentication**: GitHub OAuth with single-user access control  
 **📦 Ready to Deploy**: Complete setup guide for your own infrastructure
 
-This is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server that enables you to **securely chat with your PostgreSQL database** through Claude Desktop. Deploy your own instance with GitHub OAuth authentication, role-based access control, and enterprise-grade security features.
+This is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server that enables you to **securely chat with your PostgreSQL database** and **generate development credentials** through Claude Desktop. Deploy your own instance with GitHub OAuth authentication, role-based access control, and enterprise-grade security features.
+
+**Key Features:**
+- 🗄️ **PostgreSQL Database Access** - Query, insert, update, and manage your database via natural language
+- 🔐 **Credential Generation** - 14 tools for generating UUIDs, passwords, API keys, tokens, and cryptographic elements
+- 🛡️ **GitHub OAuth Security** - Single-user authentication with role-based permissions
+- ☁️ **Cloudflare Workers** - Scalable serverless deployment with HTTP API wrapper
 
 ## 🛡️ Security-First Features
 
@@ -39,11 +45,15 @@ For new implementations, use the `/mcp` endpoint as it provides better performan
 
 ## How It Works
 
-The MCP server provides three main tools for database interaction:
+The MCP server provides two main categories of tools:
 
+### Database Tools (3 tools)
 1. **`listTables`** - Get database schema and table information (all authenticated users)
 2. **`queryDatabase`** - Execute read-only SQL queries (all authenticated users)  
 3. **`executeDatabase`** - Execute write operations like INSERT/UPDATE/DELETE (privileged users only)
+
+### Credential Generation Tools (14 tools)
+Complete suite for generating secure credentials, tokens, passwords, and cryptographic elements for development workflows
 
 **Authentication Flow**: Users authenticate via GitHub OAuth → Server validates permissions → Tools become available based on user's GitHub username.
 
@@ -398,7 +408,9 @@ You now have a remote MCP server deployed!
 
 ### Available Tools
 
-#### 1. `listTables` (All Users)
+#### Database Management Tools
+
+##### 1. `listTables` (All Users)
 **Purpose**: Discover database schema and structure  
 **Access**: All authenticated GitHub users  
 **Usage**: Always run this first to understand your database structure
@@ -410,7 +422,7 @@ Example output:
 - Constraints and relationships
 ```
 
-#### 2. `queryDatabase` (All Users) 
+##### 2. `queryDatabase` (All Users) 
 **Purpose**: Execute read-only SQL queries  
 **Access**: All authenticated GitHub users  
 **Restrictions**: Only SELECT statements and read operations allowed
@@ -422,7 +434,7 @@ SELECT COUNT(*) FROM products;
 SELECT u.name, o.total FROM users u JOIN orders o ON u.id = o.user_id;
 ```
 
-#### 3. `executeDatabase` (Privileged Users Only)
+##### 3. `executeDatabase` (Privileged Users Only)
 **Purpose**: Execute write operations (INSERT, UPDATE, DELETE, DDL)  
 **Access**: Restricted to specific GitHub usernames  
 **Capabilities**: Full database write access including schema modifications
@@ -434,6 +446,53 @@ UPDATE products SET price = 29.99 WHERE id = 1;
 DELETE FROM orders WHERE status = 'cancelled';
 CREATE TABLE new_table (id SERIAL PRIMARY KEY, data TEXT);
 ```
+
+#### Credential Generation Tools (All Users)
+
+This MCP server includes 14 powerful credential generation tools for secure development workflows:
+
+##### Unique Identifiers
+- **`generateUuid`** - UUID4 and ULID generation for unique identification
+- **`generateNanoId`** - URL-safe unique string identifiers with customizable length
+
+##### Random Strings
+- **`generateString`** - Customizable random strings with character sets, length, and formatting
+- **`generateHex`** - Hexadecimal strings for binary data and checksums
+- **`generateBase64`** - Base64 encoded strings for data encoding
+
+##### Passwords & Authentication
+- **`generatePassword`** - Secure passwords with complexity rules and OWASP compliance
+- **`generatePassphrase`** - Dictionary-based passphrases for memorable security
+- **`generatePin`** - Numeric PIN codes for authentication systems
+
+##### API Keys & Tokens
+- **`generateApiKey`** - API keys in hex, base64, or base64url formats
+- **`generateToken`** - Bearer tokens, JWT secrets, session tokens, CSRF tokens
+
+##### Cryptographic Elements
+- **`generateCrypto`** - Salts, IVs, HMAC keys, encryption keys, and nonces
+
+##### Service-Specific Credentials
+- **`generateServiceCredential`** - AWS credentials, GitHub tokens, database passwords
+
+##### Batch Operations
+- **`generateBatch`** - Generate multiple credentials in one operation
+- **`listGenerationTypes`** - List all available generation types with descriptions
+
+**Example Usage:**
+```
+generatePassword length=20 exclude_ambiguous=true
+generateApiKey format="base64" length=64
+generateToken type="bearer" length=128
+generateServiceCredential service="aws"
+```
+
+**Key Features:**
+- 🔒 Cryptographically secure random generation
+- 📊 Entropy calculations for each credential type
+- 🎯 Service-specific formatting (AWS, GitHub patterns)
+- 💾 Direct integration with database storage
+- 🔧 Customizable parameters for all generators
 
 ### Access Control Configuration
 
