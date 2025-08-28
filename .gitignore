@@ -230,3 +230,6 @@ database-*.sql
 *.db.backup
 
 # Extra folders
+
+# Project instructions - exclude from version control
+CLAUDE.md
