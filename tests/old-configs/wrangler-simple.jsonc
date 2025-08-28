@@ -1,0 +1,30 @@
+{
+  "name": "simple-math-mcp",
+  "main": "src/simple-math.ts",
+  "compatibility_date": "2025-03-10",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "vars": {
+    "NODE_ENV": "development"
+  },
+	"migrations": [
+		{
+			"new_sqlite_classes": [
+				"MyMCP"
+			],
+			"tag": "v1"
+		}
+	],  
+  "durable_objects": {
+    "bindings": [
+      {
+        "class_name": "MyMCP",
+        "name": "MCP_OBJECT"
+      }
+    ]
+  },
+  "dev": {
+    "port": 8789
+  }
+}

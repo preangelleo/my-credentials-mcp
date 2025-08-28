@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "database-mcp": {
+      "command": "npx",
+      "args": ["mcp-remote", "https://your-mcp-server.workers.dev/mcp"],
+      "env": {}
+    }
+  }
+}
