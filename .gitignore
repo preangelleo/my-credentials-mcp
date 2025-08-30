@@ -188,6 +188,9 @@ test-*.js
 *.test.js
 claude_desktop_config_*.json
 mcp-api-nginx-location.conf
+.claude-flow
+.swarm
+.swarm-memory.db
 
 # Backup files
 *.backup
@@ -233,3 +236,4 @@ database-*.sql
 
 # Project instructions - exclude from version control
 CLAUDE.md
+PRIVATE
