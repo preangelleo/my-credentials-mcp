@@ -56,8 +56,8 @@ export function registerHttpApiTools(server: McpServer, env: Env, props: Props) 
 	// Tool 1: List Tables - Available to all authenticated users
 	server.tool(
 		"listTables",
-		"Get a list of all tables in the database along with their column information. Use this first to understand the database structure before querying. The main credentials table is 'local_credentials' (not just 'credentials').",
-		ListTablesSchema,
+		"Get a list of all tables in the database along with their column information. Use this first to understand the database structure before querying. SCHEMA INFO: Main table 'local_credentials' (columns: id, name, value, description, notes, created_at, updated_at) and 'complaints' table (columns: id, complaint_text, language, signature, created_at, ip_hash, user_agent_hash, agent_owner, model_name). Always use correct table and column names!",
+		{},
 		async () => {
 			try {
 				const result = await callHttpApi('/api/tables');
@@ -87,7 +87,7 @@ export function registerHttpApiTools(server: McpServer, env: Env, props: Props) 
 	// Tool 2: Query Database - Available to all authenticated users (read-only)
 	server.tool(
 		"queryDatabase",
-		"Execute a read-only SQL query against the PostgreSQL database via HTTP API. This tool only allows SELECT statements and other read operations. All authenticated users can use this tool. Main table: 'local_credentials' for credentials storage.",
+		"Execute a read-only SQL query against the PostgreSQL database via HTTP API. This tool only allows SELECT statements and other read operations. All authenticated users can use this tool. SCHEMA INFO: Main table 'local_credentials' (columns: id, name, value, description, notes, created_at, updated_at) and 'complaints' table (columns: id, complaint_text, language, signature, created_at, ip_hash, user_agent_hash, agent_owner, model_name). Always use correct table and column names - NOT 'credentials' but 'local_credentials'!",
 		QueryDatabaseSchema,
 		async ({ sql }) => {
 			try {
@@ -119,7 +119,7 @@ export function registerHttpApiTools(server: McpServer, env: Env, props: Props) 
 	if (ALLOWED_USERNAMES.has(props.login)) {
 		server.tool(
 			"executeDatabase",
-			"Execute any SQL statement against the PostgreSQL database via HTTP API, including INSERT, UPDATE, DELETE, and DDL operations. This tool is restricted to specific GitHub users and can perform write transactions. **USE WITH CAUTION** - this can modify or delete data. Main table: 'local_credentials' for credentials storage.",
+			"Execute any SQL statement against the PostgreSQL database via HTTP API, including INSERT, UPDATE, DELETE, and DDL operations. This tool is restricted to specific GitHub users and can perform write transactions. **USE WITH CAUTION** - this can modify or delete data. SCHEMA INFO: Main table 'local_credentials' (columns: id, name, value, description, notes, created_at, updated_at) and 'complaints' table (columns: id, complaint_text, language, signature, created_at, ip_hash, user_agent_hash, agent_owner, model_name). Always use correct table and column names!",
 			ExecuteDatabaseSchema,
 			async ({ sql }) => {
 				try {

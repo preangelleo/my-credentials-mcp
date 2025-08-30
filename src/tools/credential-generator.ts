@@ -30,6 +30,7 @@ export interface StringOptions extends BaseOptions {
   include_special_chars?: boolean;
   exclude_chars?: string;
   custom_charset?: string;
+  special_char_set?: string;
   min_length?: number;
   max_length?: number;
 }

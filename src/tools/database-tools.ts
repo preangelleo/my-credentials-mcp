@@ -21,7 +21,7 @@ export function registerDatabaseTools(server: McpServer, env: Env, props: Props)
 	server.tool(
 		"listTables",
 		"Get a list of all tables in the database along with their column information. Use this first to understand the database structure before querying.",
-		ListTablesSchema,
+		{},
 		async () => {
 			try {
 				// Bypass database connection temporarily to test if it's the postgres library issue

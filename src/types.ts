@@ -69,15 +69,19 @@ export const ExecuteDatabaseSchema = {
     .describe("SQL command to execute (INSERT, UPDATE, DELETE, CREATE, etc.)"),
 };
 
-// MCP response types
+// MCP response types - Updated for current MCP SDK
 export interface McpTextContent {
+  [x: string]: unknown;
   type: "text";
   text: string;
-  isError?: boolean;
+  _meta?: { [x: string]: unknown } | undefined;
 }
 
 export interface McpResponse {
+  [x: string]: unknown;
   content: McpTextContent[];
+  _meta?: { [x: string]: unknown } | undefined;
+  isError?: boolean;
 }
 
 // Standard response creators
