@@ -7,7 +7,7 @@ import { registerAllTools } from "./tools/register-tools";
 
 export class MyMCP extends McpAgent<Env, Record<string, never>, Props> {
 	server = new McpServer({
-		name: "PostgreSQL Database MCP Server (HTTP API)",
+		name: "PostgreSQL Database MCP Server (HTTP API) - Main Table: local_credentials",
 		version: "1.1.0",
 	});
 

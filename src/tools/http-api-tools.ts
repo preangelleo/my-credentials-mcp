@@ -56,7 +56,7 @@ export function registerHttpApiTools(server: McpServer, env: Env, props: Props) 
 	// Tool 1: List Tables - Available to all authenticated users
 	server.tool(
 		"listTables",
-		"Get a list of all tables in the database along with their column information. Use this first to understand the database structure before querying.",
+		"Get a list of all tables in the database along with their column information. Use this first to understand the database structure before querying. The main credentials table is 'local_credentials' (not just 'credentials').",
 		ListTablesSchema,
 		async () => {
 			try {
@@ -71,7 +71,7 @@ export function registerHttpApiTools(server: McpServer, env: Env, props: Props) 
 					content: [
 						{
 							type: "text",
-							text: `**MCP Server Status**\n\n✅ **Authentication**: GitHub OAuth working\n✅ **HTTP API**: Connected to animagent.ai:3001\n✅ **Database**: PostgreSQL via HTTP API wrapper\n✅ **Connection**: Using HTTP API (resolves Cloudflare Workers limitations)\n\n**Table Schema:**\n\`\`\`json\n${JSON.stringify(tableInfo, null, 2)}\n\`\`\`\n\n**Tables found:** ${tableInfo.length}\n**API Response time:** ${result.duration || 'N/A'}\n**Retrieved at:** ${result.timestamp}`
+							text: `**MCP Server Status**\n\n✅ **Authentication**: GitHub OAuth working\n✅ **HTTP API**: Connected to ${API_BASE_URL}\n✅ **Database**: PostgreSQL via HTTP API wrapper\n✅ **Connection**: Using HTTP API (resolves Cloudflare Workers limitations)\n\n🔑 **MAIN TABLE**: \`local_credentials\` - Use this for credentials queries (NOT just 'credentials')\n\n**Table Schema:**\n\`\`\`json\n${JSON.stringify(tableInfo, null, 2)}\n\`\`\`\n\n**Tables found:** ${tableInfo.length}\n**API Response time:** ${result.duration || 'N/A'}\n**Retrieved at:** ${result.timestamp}`
 						}
 					]
 				};
@@ -87,7 +87,7 @@ export function registerHttpApiTools(server: McpServer, env: Env, props: Props) 
 	// Tool 2: Query Database - Available to all authenticated users (read-only)
 	server.tool(
 		"queryDatabase",
-		"Execute a read-only SQL query against the PostgreSQL database via HTTP API. This tool only allows SELECT statements and other read operations. All authenticated users can use this tool.",
+		"Execute a read-only SQL query against the PostgreSQL database via HTTP API. This tool only allows SELECT statements and other read operations. All authenticated users can use this tool. Main table: 'local_credentials' for credentials storage.",
 		QueryDatabaseSchema,
 		async ({ sql }) => {
 			try {
@@ -119,7 +119,7 @@ export function registerHttpApiTools(server: McpServer, env: Env, props: Props) 
 	if (ALLOWED_USERNAMES.has(props.login)) {
 		server.tool(
 			"executeDatabase",
-			"Execute any SQL statement against the PostgreSQL database via HTTP API, including INSERT, UPDATE, DELETE, and DDL operations. This tool is restricted to specific GitHub users and can perform write transactions. **USE WITH CAUTION** - this can modify or delete data.",
+			"Execute any SQL statement against the PostgreSQL database via HTTP API, including INSERT, UPDATE, DELETE, and DDL operations. This tool is restricted to specific GitHub users and can perform write transactions. **USE WITH CAUTION** - this can modify or delete data. Main table: 'local_credentials' for credentials storage.",
 			ExecuteDatabaseSchema,
 			async ({ sql }) => {
 				try {
