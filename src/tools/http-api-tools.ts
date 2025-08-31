@@ -56,7 +56,23 @@ export function registerHttpApiTools(server: McpServer, env: Env, props: Props) 
 	// Tool 1: List Tables - Available to all authenticated users
 	server.tool(
 		"listTables",
-		"Get a list of all tables in the database along with their column information. Use this first to understand the database structure before querying. SCHEMA INFO: Main tables include 'local_credentials' (credentials management), 'complaints' (AI feedback), and 'product_improvement_suggestions' (feature requests & bug reports). Always use correct table and column names! 📚 Documentation & Source: https://github.com/preangelleo/my-credentials-mcp",
+		`🗄️ DATABASE SCHEMA DISCOVERY
+		
+Get complete database structure with table names, columns, and types. CRITICAL: Always call this first before any database operations!
+
+📊 MAIN TABLES:
+• local_credentials (id, name, value, description, notes, created_at, updated_at) - 50+ stored credentials
+• complaints (id, complaint_text, language, signature, created_at, model_name) - AI feedback system  
+• product_improvement_suggestions (id, product_name, title, brief, detailed_suggestion, status, priority, suggester_signature, developer_notes, created_at, updated_at) - Feature requests & bug reports
+
+⚠️ IMPORTANT TABLE NAMES:
+- Use 'local_credentials' NOT 'credentials' 
+- Use exact column names from schema
+- All timestamps are PostgreSQL format
+
+💡 USAGE: Call this tool first, then use queryDatabase with exact table/column names from the response.
+
+📚 Documentation: https://github.com/preangelleo/my-credentials-mcp`,
 		{},
 		async () => {
 			try {
@@ -87,7 +103,30 @@ export function registerHttpApiTools(server: McpServer, env: Env, props: Props) 
 	// Tool 2: Query Database - Available to all authenticated users (read-only)
 	server.tool(
 		"queryDatabase",
-		"Execute a read-only SQL query against the PostgreSQL database via HTTP API. This tool only allows SELECT statements and other read operations. All authenticated users can use this tool. SCHEMA INFO: Main tables are 'local_credentials' (credentials management), 'complaints' (AI feedback), and 'product_improvement_suggestions' (feature requests). Always use correct table and column names! 📚 Documentation: https://github.com/preangelleo/my-credentials-mcp",
+		`📊 READ-ONLY DATABASE QUERIES
+		
+Execute SELECT queries against PostgreSQL database. Safe for all authenticated users - cannot modify data.
+
+🔍 QUERY EXAMPLES:
+• SELECT * FROM local_credentials WHERE name ILIKE '%github%' 
+• SELECT COUNT(*) FROM complaints WHERE created_at > '2025-08-01'
+• SELECT product_name, status, priority FROM product_improvement_suggestions ORDER BY created_at DESC LIMIT 10
+• SELECT name, description FROM local_credentials WHERE description IS NOT NULL
+
+📋 TABLE REFERENCE:
+• local_credentials: name, value, description, notes, created_at, updated_at
+• complaints: complaint_text, language, signature, model_name, created_at  
+• product_improvement_suggestions: product_name, title, brief, status, priority, developer_notes
+
+⚠️ RESTRICTIONS:
+- Only SELECT, WITH, and read-only operations allowed
+- No INSERT, UPDATE, DELETE, or DDL operations
+- Use exact table names from listTables response
+- PostgreSQL syntax required (ILIKE for case-insensitive search)
+
+🎯 TIP: Call listTables first to get exact schema, then craft your SELECT queries.
+
+📚 Documentation: https://github.com/preangelleo/my-credentials-mcp`,
 		QueryDatabaseSchema,
 		async ({ sql }) => {
 			try {
@@ -119,7 +158,35 @@ export function registerHttpApiTools(server: McpServer, env: Env, props: Props) 
 	if (ALLOWED_USERNAMES.has(props.login)) {
 		server.tool(
 			"executeDatabase",
-			"Execute any SQL statement against the PostgreSQL database via HTTP API, including INSERT, UPDATE, DELETE, and DDL operations. This tool is restricted to specific GitHub users and can perform write transactions. **USE WITH CAUTION** - this can modify or delete data. SCHEMA INFO: Main table 'local_credentials' (columns: id, name, value, description, notes, created_at, updated_at) and 'complaints' table (columns: id, complaint_text, language, signature, created_at, ip_hash, user_agent_hash, agent_owner, model_name). Always use correct table and column names!",
+			`⚠️ PRIVILEGED DATABASE OPERATIONS (WRITE ACCESS)
+			
+Execute ANY SQL operation including INSERT, UPDATE, DELETE, DDL. **RESTRICTED to authorized GitHub users only.**
+
+🔥 WRITE EXAMPLES:
+• INSERT INTO local_credentials (name, value, description) VALUES ('api_key_name', 'secret_value', 'My API key')
+• UPDATE product_improvement_suggestions SET status = 'completed', developer_notes = 'Fixed in v1.2' WHERE id = 5
+• DELETE FROM complaints WHERE created_at < '2025-01-01'
+• ALTER TABLE local_credentials ADD COLUMN category TEXT DEFAULT 'general'
+
+📊 FULL TABLE SCHEMAS:
+• local_credentials (id SERIAL PRIMARY KEY, name VARCHAR UNIQUE NOT NULL, value TEXT NOT NULL, description TEXT, notes TEXT, created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW())
+• complaints (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), complaint_text TEXT NOT NULL, language VARCHAR NOT NULL, signature VARCHAR NOT NULL, created_at TIMESTAMPTZ DEFAULT NOW(), model_name VARCHAR)
+• product_improvement_suggestions (id SERIAL PRIMARY KEY, product_name TEXT NOT NULL, title TEXT NOT NULL, brief TEXT, detailed_suggestion TEXT, status TEXT DEFAULT 'submitted', priority TEXT DEFAULT 'medium', suggester_signature TEXT, developer_notes TEXT, created_at TIMESTAMPTZ DEFAULT NOW(), updated_at TIMESTAMPTZ DEFAULT NOW())
+
+⚠️ CRITICAL WARNINGS:
+- **CAN PERMANENTLY DELETE/MODIFY DATA**
+- Only available to user: preangelleo
+- All operations are logged with username
+- Use transactions for complex operations
+- Test queries with queryDatabase first when possible
+
+🎯 BEST PRACTICES:
+1. Always use WHERE clauses in UPDATE/DELETE
+2. Use RETURNING * to see affected rows
+3. Backup important data before major changes
+4. Test with SELECT before running modification queries
+
+📚 Documentation: https://github.com/preangelleo/my-credentials-mcp`,
 			ExecuteDatabaseSchema,
 			async ({ sql }) => {
 				try {

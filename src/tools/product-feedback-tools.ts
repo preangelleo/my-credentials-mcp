@@ -43,7 +43,31 @@ export function registerProductFeedbackTools(server: McpServer, env: Env, props:
 	// Tool 1: Submit Product Suggestion - Available to all authenticated users
 	server.tool(
 		"submitProductSuggestion",
-		"Submit a product improvement suggestion or bug report. Provide detailed feedback about MCP server products to help developers prioritize improvements. All authenticated users can submit suggestions. 📚 Documentation: https://github.com/preangelleo/my-credentials-mcp",
+		`📝 PRODUCT IMPROVEMENT SUGGESTIONS
+		
+Submit bug reports, feature requests, and improvement suggestions for MCP server products. Available to all authenticated users.
+
+📊 REQUIRED PARAMETERS:
+• product_name: MCP server name (e.g., "My Credentials MCP Server", "Ghost Blog Management MCP Server")  
+• title: Clear, concise issue/feature title (e.g., "Fix HTTP 500 error in API", "Add batch delete functionality")
+
+🔧 OPTIONAL PARAMETERS:
+• brief: Short summary (1-2 sentences)
+• detailed_suggestion: Technical details, steps to reproduce, proposed solutions
+• priority: low | medium | high | critical (default: medium)
+• suggester_signature: Your identifier (auto-generated if not provided)
+
+💡 USAGE EXAMPLES:
+• Bug Report: {product_name: "Ghost Blog API", title: "404 error on post delete", priority: "high", detailed_suggestion: "DELETE /posts/{id} returns 404 even for valid IDs"}
+• Feature Request: {product_name: "Credentials MCP", title: "Add SSH key generation", brief: "Support for ED25519 SSH key pairs"}
+• Enhancement: {product_name: "Database Tools", title: "Improve error messages", priority: "medium"}
+
+📋 WORKFLOW:
+submitted → under_review → accepted/rejected → in_progress → completed
+
+🎯 TIP: Be specific with product names and provide technical details for faster resolution.
+
+📚 Documentation: https://github.com/preangelleo/my-credentials-mcp`,
 		SubmitSuggestionSchema.shape,
 		async ({ product_name, title, brief, detailed_suggestion, priority = 'medium', suggester_signature }) => {
 			try {
@@ -104,7 +128,37 @@ ${brief ? `**Brief:** ${brief}` : ''}
 	// Tool 2: Get Product Suggestions - Available to all authenticated users  
 	server.tool(
 		"getProductSuggestions",
-		"Retrieve product improvement suggestions with optional filters. Search by product name, status, priority, or get recent submissions. All authenticated users can view suggestions. 📚 Documentation: https://github.com/preangelleo/my-credentials-mcp",
+		`🔍 BROWSE PRODUCT SUGGESTIONS
+		
+Retrieve and filter product improvement suggestions. Perfect for checking status of your submissions or browsing existing requests.
+
+🎛️ FILTER OPTIONS (all optional):
+• product_name: Partial match (e.g., "Ghost", "Credentials", "MCP")
+• status: submitted | under_review | accepted | in_progress | completed | rejected  
+• priority: low | medium | high | critical
+• limit: Number of results (1-100, default: 10)
+
+🔍 SEARCH EXAMPLES:
+• Recent critical issues: {priority: "critical", limit: 5}
+• All Ghost Blog suggestions: {product_name: "Ghost Blog", limit: 20}
+• Completed features: {status: "completed"}
+• Your submissions: {suggester_signature: "your-username"}
+• All recent: {} (no filters = latest 10)
+
+📊 RESPONSE INCLUDES:
+• Suggestion ID, title, product name
+• Current status and priority level  
+• Suggester info and creation date
+• Brief description preview
+• Developer notes (if any)
+
+💡 USAGE TIPS:
+- Use partial product names for broader search
+- Check status regularly for updates on your submissions
+- Filter by priority to see urgent issues
+- Use higher limits (50-100) for comprehensive views
+
+📚 Documentation: https://github.com/preangelleo/my-credentials-mcp`,
 		GetSuggestionsSchema.shape,
 		async ({ product_name, status, priority, limit = 10 }) => {
 			try {
@@ -190,7 +244,41 @@ ${s.developer_notes ? `🔧 **Developer Notes:** ${s.developer_notes.substring(0
 	if (PRIVILEGED_USERS.has(props.login)) {
 		server.tool(
 			"updateSuggestionStatus",
-			"Update the status of a product improvement suggestion. Only authorized developers can update suggestion status, add notes, and change priority. Restricted to specific GitHub users. 📚 Documentation: https://github.com/preangelleo/my-credentials-mcp",
+			`⚠️ DEVELOPER STATUS UPDATES (RESTRICTED ACCESS)
+			
+Update suggestion status and add developer notes. **RESTRICTED to authorized developers only (preangelleo).**
+
+📊 REQUIRED PARAMETERS:
+• id: Suggestion ID (number from getProductSuggestions)
+• status: submitted | under_review | accepted | in_progress | completed | rejected
+
+🔧 OPTIONAL PARAMETERS:  
+• developer_notes: Technical notes, implementation details, resolution info
+• priority: Change priority level (low | medium | high | critical)
+
+💡 STATUS WORKFLOW:
+submitted → under_review → accepted → in_progress → completed
+                      ↘ rejected
+
+🔥 USAGE EXAMPLES:
+• Accept suggestion: {id: 5, status: "accepted", developer_notes: "Good idea, will implement in v2.1", priority: "high"}
+• Mark completed: {id: 8, status: "completed", developer_notes: "Fixed in commit abc123 - deployed to production"}  
+• Reject with reason: {id: 12, status: "rejected", developer_notes: "Conflicts with security policy - cannot implement"}
+• Update progress: {id: 15, status: "in_progress", developer_notes: "50% complete - API changes done, testing UI"}
+
+📋 DEVELOPER RESPONSIBILITIES:
+- Provide clear, technical developer_notes for transparency
+- Update priority if reassessing importance  
+- Move through workflow stages systematically
+- Document implementation details and commit references
+
+🎯 BEST PRACTICES:
+1. Always add meaningful developer_notes when changing status
+2. Reference specific commits, PRs, or version numbers
+3. Explain rejection reasons clearly for future reference
+4. Update priority based on technical assessment
+
+📚 Documentation: https://github.com/preangelleo/my-credentials-mcp`,
 			UpdateSuggestionStatusSchema.shape,
 			async ({ id, status, developer_notes, priority }) => {
 				try {
