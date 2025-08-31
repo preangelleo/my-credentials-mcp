@@ -50,12 +50,12 @@ export const GenerateUuidSchema = {
 };
 
 export const GenerateNanoIdSchema = {
-	length: z.number().int().min(1).max(100).optional().default(21).describe("Length of the Nano ID")
+	length: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().int().min(1).max(100)).optional().default(21).describe("Length of the Nano ID")
 };
 
 // String Generation Schemas  
 export const GenerateStringSchema = {
-	length: z.number().int().min(1).max(1000).optional().default(32).describe("Length of the string to generate"),
+	length: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().int().min(1).max(1000)).optional().default(32).describe("Length of the string to generate"),
 	include_uppercase: z.boolean().optional().default(true).describe("Include uppercase letters"),
 	include_lowercase: z.boolean().optional().default(true).describe("Include lowercase letters"),
 	include_numbers: z.boolean().optional().default(true).describe("Include numbers"),
@@ -68,67 +68,67 @@ export const GenerateStringSchema = {
 };
 
 export const GenerateHexSchema = {
-	length: z.number().int().min(1).max(1000).optional().default(32).describe("Length of hex string to generate")
+	length: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().int().min(1).max(1000)).optional().default(32).describe("Length of hex string to generate")
 };
 
 export const GenerateBase64Schema = {
-	length: z.number().int().min(1).max(1000).optional().default(32).describe("Length of base64 string to generate")
+	length: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().int().min(1).max(1000)).optional().default(32).describe("Length of base64 string to generate")
 };
 
 // Password Generation Schemas
 export const GeneratePasswordSchema = {
-	length: z.number().int().min(4).max(200).optional().default(16).describe("Length of the password"),
+	length: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().int().min(4).max(200)).optional().default(16).describe("Length of the password"),
 	include_uppercase: z.boolean().optional().default(true).describe("Include uppercase letters"),
 	include_lowercase: z.boolean().optional().default(true).describe("Include lowercase letters"),
 	include_numbers: z.boolean().optional().default(true).describe("Include numbers"),
 	include_special_chars: z.boolean().optional().default(true).describe("Include special characters"),
 	exclude_ambiguous: z.boolean().optional().default(false).describe("Exclude ambiguous characters (0,O,l,1,etc)"),
-	min_uppercase: z.number().int().min(0).optional().default(1).describe("Minimum uppercase letters"),
-	min_lowercase: z.number().int().min(0).optional().default(1).describe("Minimum lowercase letters"),
-	min_numbers: z.number().int().min(0).optional().default(1).describe("Minimum numbers"),
-	min_special: z.number().int().min(0).optional().default(1).describe("Minimum special characters"),
+	min_uppercase: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().int().min(0)).optional().default(1).describe("Minimum uppercase letters"),
+	min_lowercase: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().int().min(0)).optional().default(1).describe("Minimum lowercase letters"),
+	min_numbers: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().int().min(0)).optional().default(1).describe("Minimum numbers"),
+	min_special: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().int().min(0)).optional().default(1).describe("Minimum special characters"),
 	special_char_set: z.string().optional().describe("Custom special character set"),
 	strength: z.enum(['low', 'medium', 'high', 'maximum']).optional().default('high').describe("Password strength level")
 };
 
 export const GeneratePassphraseSchema = {
-	words: z.number().int().min(2).max(10).optional().default(4).describe("Number of words in passphrase"),
+	words: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().int().min(2).max(10)).optional().default(4).describe("Number of words in passphrase"),
 	separator: z.string().optional().default('-').describe("Separator between words")
 };
 
 export const GeneratePinSchema = {
-	length: z.number().int().min(3).max(20).optional().default(6).describe("Length of the PIN")
+	length: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().int().min(3).max(20)).optional().default(6).describe("Length of the PIN")
 };
 
 // Token Generation Schemas
 export const GenerateApiKeySchema = {
 	format: z.enum(['hex', 'base64', 'base64url']).optional().default('hex').describe("Format of the API key"),
-	length: z.number().int().min(8).max(200).optional().default(64).describe("Length of the API key")
+	length: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().int().min(8).max(200)).optional().default(64).describe("Length of the API key")
 };
 
 export const GenerateTokenSchema = {
 	type: z.enum(['bearer', 'jwt_secret', 'session', 'csrf']).describe("Type of token to generate"),
-	length: z.number().int().min(8).max(200).optional().default(128).describe("Length of the token")
+	length: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().int().min(8).max(200)).optional().default(128).describe("Length of the token")
 };
 
 // Cryptographic Generation Schemas
 export const GenerateCryptoSchema = {
 	type: z.enum(['salt', 'iv', 'hmac_key', 'encryption_key', 'nonce']).describe("Type of cryptographic element"),
 	algorithm: z.string().optional().default('aes256').describe("Algorithm for key/IV generation"),
-	length: z.number().int().min(8).max(200).optional().default(32).describe("Length in bytes")
+	length: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().int().min(8).max(200)).optional().default(32).describe("Length in bytes")
 };
 
 // Service-Specific Generation Schemas
 export const GenerateServiceCredentialSchema = {
 	service: z.enum(['aws', 'github', 'database']).describe("Service type for credential generation"),
-	password_length: z.number().int().min(8).max(50).optional().default(20).describe("Password length for database credentials")
+	password_length: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().int().min(8).max(50)).optional().default(20).describe("Password length for database credentials")
 };
 
 // Batch Generation Schema
 export const GenerateBatchSchema = {
 	requests: z.array(z.object({
 		type: z.string().describe("Type of credential to generate"),
-		count: z.number().int().min(1).max(50).describe("Number of items to generate"),
+		count: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().int().min(1).max(50)).describe("Number of items to generate"),
 		options: z.record(z.any()).optional().describe("Options for generation")
 	})).min(1).max(10).describe("Array of generation requests")
 };

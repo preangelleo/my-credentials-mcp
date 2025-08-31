@@ -845,6 +845,7 @@ export function generateBatch(requests: BatchRequest[]): GenerationResult {
       let result: GenerationResult;
       
       switch (type) {
+        // UUID and ID types
         case 'uuid4':
           result = generateUuid4();
           break;
@@ -854,17 +855,79 @@ export function generateBatch(requests: BatchRequest[]): GenerationResult {
         case 'nano_id':
           result = generateNanoId(options.length);
           break;
-        case 'password':
-          result = generatePassword(options.length || 16, options);
-          break;
-        case 'api_key':
-          result = generateApiKey(options.format, options.length);
-          break;
+          
+        // String types
         case 'random_string':
           result = generateRandomString(options.length || 32, options);
           break;
+        case 'hex_string':
+          result = generateHexString(options.length || 32);
+          break;
+        case 'base64_string':
+          result = generateBase64String(options.length || 32);
+          break;
+          
+        // Password types
+        case 'password':
+        case 'secure_password':
+          result = generatePassword(options.length || 16, options);
+          break;
+        case 'passphrase':
+          result = generatePassphrase(options.words || 4, options.separator || '-');
+          break;
+        case 'pin':
+          result = generatePin(options.length || 6);
+          break;
+          
+        // API and Token types
+        case 'api_key':
+          result = generateApiKey(options.format, options.length);
+          break;
+        case 'bearer_token':
+          result = generateBearerToken(options.length || 128);
+          break;
+        case 'jwt_secret':
+          result = generateJwtSecret(options.length || 256);
+          break;
+        case 'session_token':
+          result = generateSessionToken(options.length || 128);
+          break;
+        case 'csrf_token':
+          result = generateCsrfToken(options.length || 32);
+          break;
+          
+        // Cryptographic types
+        case 'password_salt':
+        case 'salt':
+          result = generateSalt(options.length || 32);
+          break;
+        case 'initialization_vector':
+        case 'iv':
+          result = generateIv(options.algorithm || 'aes256');
+          break;
+        case 'hmac_key':
+          result = generateHmacKey(options.length || 64);
+          break;
+        case 'encryption_key':
+          result = generateEncryptionKey(options.algorithm || 'aes256');
+          break;
+        case 'nonce':
+          result = generateNonce(options.length || 16);
+          break;
+          
+        // Service-specific types
+        case 'aws_credentials':
+          result = generateAwsCredentials();
+          break;
+        case 'github_token':
+          result = generateGithubToken();
+          break;
+        case 'database_password':
+          result = generateDatabasePassword(options.length || 20);
+          break;
+          
         default:
-          throw new Error(`Unknown credential type: ${type}`);
+          throw new Error(`Unknown credential type: ${type}. Supported types: uuid4, ulid, nano_id, random_string, hex_string, base64_string, password, secure_password, passphrase, pin, api_key, bearer_token, jwt_secret, session_token, csrf_token, salt, password_salt, iv, initialization_vector, hmac_key, encryption_key, nonce, aws_credentials, github_token, database_password`);
       }
       
       results[type].push(result);

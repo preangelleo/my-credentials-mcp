@@ -20,11 +20,11 @@ const GetSuggestionsSchema = z.object({
 	product_name: z.string().optional(),
 	status: z.enum(['submitted', 'under_review', 'accepted', 'in_progress', 'completed', 'rejected']).optional(),
 	priority: z.enum(['low', 'medium', 'high', 'critical']).optional(),
-	limit: z.number().min(1).max(100).default(10)
+	limit: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().min(1).max(100)).default(10)
 });
 
 const UpdateSuggestionStatusSchema = z.object({
-	id: z.number().min(1),
+	id: z.union([z.number(), z.string().transform(Number)]).pipe(z.number().min(1)),
 	status: z.enum(['submitted', 'under_review', 'accepted', 'in_progress', 'completed', 'rejected']),
 	developer_notes: z.string().optional(),
 	priority: z.enum(['low', 'medium', 'high', 'critical']).optional()
