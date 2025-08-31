@@ -15,6 +15,7 @@ A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) s
 - **Database Management**: Insert, update, delete operations (with role-based permissions)
 - **Schema Discovery**: Automatically discover tables, columns, and relationships
 - **Product Feedback System**: Built-in suggestion and bug reporting system
+- **Enhanced Tool Descriptions**: Comprehensive examples, table schemas, and SQL guidance for better LLM execution
 
 ### 🔐 Credential Generation (14 Tools)
 - **Unique Identifiers**: UUID4, ULID, Nano ID generation
@@ -31,6 +32,21 @@ A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) s
 - **Role-Based Permissions**: Separate read/write access levels
 - **HTTP API Wrapper**: Bypasses Cloudflare Workers limitations
 - **Audit Logging**: All operations tracked with user context
+
+## 🆕 Recent Enhancements (v0.0.1)
+
+### 🔧 Bug Fixes & Stability
+- ✅ **Fixed HTTP 500 Errors**: Resolved `submitProductSuggestion` API conflicts
+- ✅ **Schema Registration**: Fixed TypeScript compilation issues with Zod schemas
+- ✅ **Database Parameter Handling**: Improved SQL query processing for HTTP API wrapper
+- ✅ **API Unification**: Eliminated duplicate HTTP implementations
+
+### 📚 Enhanced Documentation
+- 🎯 **Comprehensive Tool Descriptions**: Each MCP tool now includes detailed parameter explanations, usage examples, and workflows
+- 📊 **Complete Table Schemas**: Full column definitions and relationships for all database tables  
+- 🔍 **SQL Query Examples**: Practical PostgreSQL examples for common operations
+- ⚠️ **Best Practices Guide**: Security warnings, troubleshooting tips, and optimization guidance
+- 💡 **LLM-Optimized**: Enhanced descriptions reduce parameter errors and improve execution success rates
 
 ## 🏗️ Architecture
 
