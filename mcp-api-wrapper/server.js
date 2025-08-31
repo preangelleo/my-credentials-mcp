@@ -22,7 +22,7 @@ const pool = new Pool({
 
 // Parse privileged users from environment
 const PRIVILEGED_USERS = new Set(
-  (process.env.PRIVILEGED_USERS || 'preangelleo,coleam00').split(',').map(u => u.trim())
+  (process.env.PRIVILEGED_USERS)
 );
 
 // Middleware

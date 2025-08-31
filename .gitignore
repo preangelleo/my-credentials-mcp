@@ -236,4 +236,13 @@ database-*.sql
 
 # Project instructions - exclude from version control
 CLAUDE.md
-PRIVATE
+PRIVATE/
+development/
+deployment/
+.claude
+
+# Sensitive production files
+PRPs/
+claude-code-prp-setup.md
+claude-desktop-config.example.json
+setup-database.sh

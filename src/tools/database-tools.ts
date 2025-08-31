@@ -13,7 +13,7 @@ import { withDatabase } from "../database/utils";
 const ALLOWED_USERNAMES = new Set<string>([
 	// Add GitHub usernames of users who should have access to database write operations
 	'preangelleo',  // Your GitHub username
-	'coleam00'      // Original project author
+	''      // Original project author
 ]);
 
 export function registerDatabaseTools(server: McpServer, env: Env, props: Props) {

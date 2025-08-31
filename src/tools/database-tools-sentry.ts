@@ -14,7 +14,7 @@ import { withDatabase } from "../database/utils";
 const ALLOWED_USERNAMES = new Set<string>([
 	// Add GitHub usernames of users who should have access to database write operations
 	// For example: 'yourusername', 'coworkerusername'
-	'coleam00'
+	''
 ]);
 
 // Error handling helper for MCP tools with Sentry

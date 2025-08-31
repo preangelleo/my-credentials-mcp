@@ -56,7 +56,7 @@ export function registerHttpApiTools(server: McpServer, env: Env, props: Props) 
 	// Tool 1: List Tables - Available to all authenticated users
 	server.tool(
 		"listTables",
-		"Get a list of all tables in the database along with their column information. Use this first to understand the database structure before querying. SCHEMA INFO: Main table 'local_credentials' (columns: id, name, value, description, notes, created_at, updated_at) and 'complaints' table (columns: id, complaint_text, language, signature, created_at, ip_hash, user_agent_hash, agent_owner, model_name). Always use correct table and column names!",
+		"Get a list of all tables in the database along with their column information. Use this first to understand the database structure before querying. SCHEMA INFO: Main tables include 'local_credentials' (credentials management), 'complaints' (AI feedback), and 'product_improvement_suggestions' (feature requests & bug reports). Always use correct table and column names! 📚 Documentation & Source: https://github.com/preangelleo/my-credentials-mcp",
 		{},
 		async () => {
 			try {
@@ -87,7 +87,7 @@ export function registerHttpApiTools(server: McpServer, env: Env, props: Props) 
 	// Tool 2: Query Database - Available to all authenticated users (read-only)
 	server.tool(
 		"queryDatabase",
-		"Execute a read-only SQL query against the PostgreSQL database via HTTP API. This tool only allows SELECT statements and other read operations. All authenticated users can use this tool. SCHEMA INFO: Main table 'local_credentials' (columns: id, name, value, description, notes, created_at, updated_at) and 'complaints' table (columns: id, complaint_text, language, signature, created_at, ip_hash, user_agent_hash, agent_owner, model_name). Always use correct table and column names - NOT 'credentials' but 'local_credentials'!",
+		"Execute a read-only SQL query against the PostgreSQL database via HTTP API. This tool only allows SELECT statements and other read operations. All authenticated users can use this tool. SCHEMA INFO: Main tables are 'local_credentials' (credentials management), 'complaints' (AI feedback), and 'product_improvement_suggestions' (feature requests). Always use correct table and column names! 📚 Documentation: https://github.com/preangelleo/my-credentials-mcp",
 		QueryDatabaseSchema,
 		async ({ sql }) => {
 			try {
