@@ -26,7 +26,7 @@ interface ApiResponse {
 	operation?: string;
 }
 
-async function callHttpApi(endpoint: string, method: 'GET' | 'POST' = 'GET', body?: any): Promise<ApiResponse> {
+export async function callHttpApi(endpoint: string, method: 'GET' | 'POST' = 'GET', body?: any): Promise<ApiResponse> {
 	try {
 		const response = await fetch(`${API_BASE_URL}${endpoint}`, {
 			method,

@@ -30,45 +30,9 @@ const UpdateSuggestionStatusSchema = z.object({
 	priority: z.enum(['low', 'medium', 'high', 'critical']).optional()
 });
 
-// HTTP API base URL
-const API_BASE_URL = 'https://animagent.ai/mcp-api';
-
-interface ApiResponse {
-	success: boolean;
-	data?: any;
-	error?: string;
-	timestamp?: string;
-	rowCount?: number;
-	duration?: string;
-	executedBy?: string;
-	operation?: string;
-}
-
-async function callHttpApi(endpoint: string, method: 'GET' | 'POST' = 'GET', body?: any): Promise<ApiResponse> {
-	try {
-		const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-			method,
-			headers: {
-				'Content-Type': 'application/json',
-				'User-Agent': 'MCP-ProductFeedback/1.0'
-			},
-			body: body ? JSON.stringify(body) : undefined,
-		});
-
-		if (!response.ok) {
-			throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-		}
-
-		return await response.json();
-	} catch (error) {
-		console.error(`Product feedback API call failed (${method} ${endpoint}):`, error);
-		return {
-			success: false,
-			error: `API call failed: ${error instanceof Error ? error.message : String(error)}`,
-			timestamp: new Date().toISOString()
-		};
-	}
-}
+// Use the shared HTTP API utility from http-api-tools 
+// This eliminates the duplicate implementation and API conflicts
+import { callHttpApi } from "./http-api-tools";
 
 const PRIVILEGED_USERS = new Set<string>([
 	'preangelleo'   // Only authorized user for status updates
@@ -80,26 +44,20 @@ export function registerProductFeedbackTools(server: McpServer, env: Env, props:
 	server.tool(
 		"submitProductSuggestion",
 		"Submit a product improvement suggestion or bug report. Provide detailed feedback about MCP server products to help developers prioritize improvements. All authenticated users can submit suggestions. 📚 Documentation: https://github.com/preangelleo/my-credentials-mcp",
-		SubmitSuggestionSchema,
+		SubmitSuggestionSchema.shape,
 		async ({ product_name, title, brief, detailed_suggestion, priority = 'medium', suggester_signature }) => {
 			try {
+				// Use direct SQL values instead of parameterized queries to work with the HTTP API wrapper
+				const finalSuggesterSignature = suggester_signature || `${props.login}-suggestion-${Date.now()}`;
 				const sql = `
 					INSERT INTO product_improvement_suggestions 
 					(product_name, title, brief, detailed_suggestion, priority, suggester_signature, created_at, updated_at)
-					VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+					VALUES ('${product_name.replace(/'/g, "''")}', '${title.replace(/'/g, "''")}', ${brief ? `'${brief.replace(/'/g, "''")}'` : 'NULL'}, ${detailed_suggestion ? `'${detailed_suggestion.replace(/'/g, "''")}'` : 'NULL'}, '${priority}', '${finalSuggesterSignature.replace(/'/g, "''")}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 					RETURNING *
 				`;
 				
 				const result = await callHttpApi('/api/execute', 'POST', {
 					sql,
-					params: [
-						product_name, 
-						title, 
-						brief || null, 
-						detailed_suggestion || null, 
-						priority,
-						suggester_signature || `${props.login}-suggestion-${Date.now()}`
-					],
 					username: props.login
 				});
 
@@ -147,7 +105,7 @@ ${brief ? `**Brief:** ${brief}` : ''}
 	server.tool(
 		"getProductSuggestions",
 		"Retrieve product improvement suggestions with optional filters. Search by product name, status, priority, or get recent submissions. All authenticated users can view suggestions. 📚 Documentation: https://github.com/preangelleo/my-credentials-mcp",
-		GetSuggestionsSchema,
+		GetSuggestionsSchema.shape,
 		async ({ product_name, status, priority, limit = 10 }) => {
 			try {
 				let sql = `
@@ -155,37 +113,27 @@ ${brief ? `**Brief:** ${brief}` : ''}
 					FROM product_improvement_suggestions
 				`;
 				const conditions: string[] = [];
-				const params: any[] = [];
-				let paramIndex = 1;
 
 				if (product_name) {
-					conditions.push(`product_name ILIKE $${paramIndex}`);
-					params.push(`%${product_name}%`);
-					paramIndex++;
+					conditions.push(`product_name ILIKE '%${product_name.replace(/'/g, "''")}%'`);
 				}
 
 				if (status) {
-					conditions.push(`status = $${paramIndex}`);
-					params.push(status);
-					paramIndex++;
+					conditions.push(`status = '${status}'`);
 				}
 
 				if (priority) {
-					conditions.push(`priority = $${paramIndex}`);
-					params.push(priority);
-					paramIndex++;
+					conditions.push(`priority = '${priority}'`);
 				}
 
 				if (conditions.length > 0) {
 					sql += ` WHERE ` + conditions.join(' AND ');
 				}
 
-				sql += ` ORDER BY created_at DESC LIMIT $${paramIndex}`;
-				params.push(limit);
+				sql += ` ORDER BY created_at DESC LIMIT ${limit}`;
 
 				const result = await callHttpApi('/api/query', 'POST', {
 					sql,
-					params,
 					username: props.login
 				});
 
@@ -243,33 +191,26 @@ ${s.developer_notes ? `🔧 **Developer Notes:** ${s.developer_notes.substring(0
 		server.tool(
 			"updateSuggestionStatus",
 			"Update the status of a product improvement suggestion. Only authorized developers can update suggestion status, add notes, and change priority. Restricted to specific GitHub users. 📚 Documentation: https://github.com/preangelleo/my-credentials-mcp",
-			UpdateSuggestionStatusSchema,
+			UpdateSuggestionStatusSchema.shape,
 			async ({ id, status, developer_notes, priority }) => {
 				try {
 					let sql = `
 						UPDATE product_improvement_suggestions 
-						SET status = $2, updated_at = CURRENT_TIMESTAMP
+						SET status = '${status}', updated_at = CURRENT_TIMESTAMP
 					`;
-					let params = [id, status];
-					let paramIndex = 3;
 
 					if (developer_notes) {
-						sql += `, developer_notes = $${paramIndex}`;
-						params.push(developer_notes);
-						paramIndex++;
+						sql += `, developer_notes = '${developer_notes.replace(/'/g, "''")}'`;
 					}
 
 					if (priority) {
-						sql += `, priority = $${paramIndex}`;
-						params.push(priority);
-						paramIndex++;
+						sql += `, priority = '${priority}'`;
 					}
 
-					sql += ` WHERE id = $1 RETURNING *`;
+					sql += ` WHERE id = ${id} RETURNING *`;
 
 					const result = await callHttpApi('/api/execute', 'POST', {
 						sql,
-						params,
 						username: props.login
 					});
 
